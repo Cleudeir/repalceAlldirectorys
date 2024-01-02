@@ -59,9 +59,21 @@ function replaceContentInFile(filePath) {
             return;
         }
         // Define the regex pattern for matching "margin-left: *px;"
-        const regexPattern = /:\s*(\d+)px;/g;
+        const regexPattern = /(\d+)px/g;
         // Replace the matched content with "margin-left: dynamicSize($1)px"
-        const replacedContent = data.replace(regexPattern, ': ${dynamicSize($1)}px');
+        let replacedContent = data.replace(regexPattern, '${dynamicSize($1)}px');
+        // If the import statement is not present, add it at the beginning of the file
+        if (data.includes("import { Colors , dynamicSize }") ||
+            data.includes("import { Colors , dynamicSize}") ||
+            data.includes("import {Colors , dynamicSize }") ||
+            data.includes("import { Colors, dynamicSize }") ||
+            data.includes("import {Colors, dynamicSize}") ||
+            data.includes("import {dynamicSize}") ||
+            data.includes("import { dynamicSize }")) {
+        }
+        else {
+            replacedContent = `import { Colors , dynamicSize } from '../../config';\n${replacedContent}`;
+        }
         // Write the modified content back to the file
         fs.writeFile(filePath, replacedContent, 'utf-8', (writeErr) => {
             if (writeErr) {
